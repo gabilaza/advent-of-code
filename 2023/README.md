@@ -3,3 +3,7 @@
 
 This year, I've decided to solve them in [Go](https://go.dev/).
 
+# Days
+
+- [Day 1](day01)
+

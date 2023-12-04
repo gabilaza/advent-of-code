@@ -30,6 +30,9 @@ func main() {
     case 1:
         output := part1(input)
         fmt.Printf("Output: %v\n", output)
+    case 2:
+        output := part2(input)
+        fmt.Printf("Output: %v\n", output)
     default:
         panic(fmt.Sprintf("I don't know nothing about this part. Is there a part %v?", part))
     }
@@ -84,6 +87,44 @@ func part1(input string) int {
                 break
             }
         }
+    }
+
+    return sum
+}
+
+func part2(input string) int {
+    var sum int
+
+    lines := strings.Split(input, "\n")
+
+    for _, lineRaw := range lines {
+        split := strings.SplitN(lineRaw, ":", 2)
+        _, setsRaw := split[0], split[1]
+
+        var maxRed, maxGreen, maxBlue int
+
+        sets := strings.Split(strings.Trim(setsRaw, " "), ";")
+        for _, setRaw := range sets {
+
+            colors := strings.Split(setRaw, ",")
+            for _, colorRaw := range colors {
+                colorRaw = strings.Trim(colorRaw, " ")
+                split = strings.SplitN(colorRaw, " ", 2)
+                amountRaw, color := split[0], split[1]
+                amount := convStrToInt(amountRaw)
+
+                if color == "red" {
+                    maxRed = max(maxRed, amount)
+                } else if color == "green" {
+                    maxGreen = max(maxGreen, amount)
+                } else if color == "blue" {
+                    maxBlue = max(maxBlue, amount)
+                }
+            }
+
+        }
+
+        sum += maxRed*maxGreen*maxBlue
     }
 
     return sum

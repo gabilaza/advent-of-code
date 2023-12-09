@@ -31,6 +31,9 @@ func main() {
     case 1:
         output := part1(input)
         fmt.Printf("Output: %v\n", output)
+    case 2:
+        output := part2(input)
+        fmt.Printf("Output: %v\n", output)
     default:
         panic(fmt.Sprintf("I don't know nothing about this part. Is there a part %v?", part))
     }
@@ -100,4 +103,100 @@ func part1(input string) int {
     }
 
     return sumPartNumbers
+}
+
+func getNumberByPosition(engineSchema []string, i int, j int) int {
+    numberStr := ""
+
+    for {
+        if !isInSchema(engineSchema, i, j) {
+            break
+        }
+
+        character := rune(engineSchema[i][j])
+        if !unicode.IsDigit(character) {
+            break
+        }
+        j--
+    }
+
+    j++
+    for {
+        if !isInSchema(engineSchema, i, j) {
+            break
+        }
+
+        character := rune(engineSchema[i][j])
+        if !unicode.IsDigit(character) {
+            break
+        }
+
+        numberStr = numberStr + string(character)
+        j++
+    }
+
+    return convStrToInt(numberStr)
+}
+
+func isDigitByPosition(engineSchema []string, i int, j int) bool {
+    return isInSchema(engineSchema, i, j) && unicode.IsDigit(rune(engineSchema[i][j]))
+}
+
+func part2(input string) int {
+    engineSchema := strings.Split(input, "\n")
+    sumGearRatios := 0
+
+    for i, row := range engineSchema {
+        for j, character := range row {
+            if character == '*' {
+                noParts := 0
+                gearRatio := 1
+
+                if isInSchema(engineSchema, i - 1, j) {
+                    if !unicode.IsDigit(rune(engineSchema[i - 1][j])) {
+                        if isDigitByPosition(engineSchema, i - 1, j - 1) {
+                            noParts++
+                            gearRatio *= getNumberByPosition(engineSchema, i - 1, j - 1)
+                        }
+                        if isDigitByPosition(engineSchema, i - 1, j + 1) {
+                            noParts++
+                            gearRatio *= getNumberByPosition(engineSchema, i - 1, j + 1)
+                        }
+                    } else {
+                        noParts++
+                        gearRatio *= getNumberByPosition(engineSchema, i - 1, j)
+                    }
+                }
+                if isInSchema(engineSchema, i + 1, j) {
+                    if !unicode.IsDigit(rune(engineSchema[i + 1][j])) {
+                        if isDigitByPosition(engineSchema, i + 1, j - 1) {
+                            noParts++
+                            gearRatio *= getNumberByPosition(engineSchema, i + 1, j - 1)
+                        }
+                        if isDigitByPosition(engineSchema, i + 1, j + 1) {
+                            noParts++
+                            gearRatio *= getNumberByPosition(engineSchema, i + 1, j + 1)
+                        }
+                    } else {
+                        noParts++
+                        gearRatio *= getNumberByPosition(engineSchema, i + 1, j)
+                    }
+                }
+                if isDigitByPosition(engineSchema, i, j - 1) {
+                    noParts++
+                    gearRatio *= getNumberByPosition(engineSchema, i, j - 1)
+                }
+                if isDigitByPosition(engineSchema, i, j + 1) {
+                    noParts++
+                    gearRatio *= getNumberByPosition(engineSchema, i, j + 1)
+                }
+
+                if noParts == 2 {
+                    sumGearRatios += gearRatio
+                }
+            }
+        }
+    }
+
+    return sumGearRatios
 }

@@ -30,6 +30,9 @@ func main() {
     case 1:
         output := part1(input)
         fmt.Printf("Output: %v\n", output)
+    case 2:
+        output := part2(input)
+        fmt.Printf("Output: %v\n", output)
     default:
         panic(fmt.Sprintf("I don't know nothing about this part. Is there a part %v?", part))
     }
@@ -85,4 +88,49 @@ func part1(input string) int {
     }
 
     return sumPoints
+}
+
+func part2(input string) int {
+    noScratchcards := 0
+
+    lines := strings.Split(input, "\n")
+
+    var instancesCards []int = make([]int, len(lines))
+
+    for cardNumber, line := range lines {
+        split := strings.SplitN(line, "|", 2)
+        firstPart, secondPart := split[0], split[1]
+        split = strings.SplitN(firstPart, ":", 2)
+
+        winingNumberStrs := strings.Split(strings.Trim(split[1], " "), " ")
+        havingNumberStrs := strings.Split(strings.Trim(secondPart, " "), " ")
+
+
+        matches := 0
+        for _, winingNumberStr := range winingNumberStrs {
+            if len(winingNumberStr) > 0 {
+                winingNumber := convStrToInt(winingNumberStr)
+
+                for _, havingNumberStr := range havingNumberStrs {
+                    if len(havingNumberStr) > 0 {
+                        havingNumber := convStrToInt(havingNumberStr)
+                        if havingNumber == winingNumber {
+                            matches++
+                        }
+                    }
+                }
+            }
+        }
+
+        instancesCards[cardNumber]++
+        for i := cardNumber + 1; matches > 0; matches-- {
+            instancesCards[i] += instancesCards[cardNumber]
+            i++
+        }
+    }
+
+    for i := 0; i < len(instancesCards); i++ {
+        noScratchcards += instancesCards[i]
+    }
+    return noScratchcards
 }
